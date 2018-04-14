@@ -1,0 +1,95 @@
+{extend name="public/base" /}
+{block name="style"}
+<!-- 选择框控件 -->
+{css href="__STATICS__/iCheck/all.css" /}
+{/block}
+{block name="main_body"}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-primary">
+            <div class="box-header">
+                <a href="{:url('User/create_user')}" class="btn btn-success btn-sm"><i class="fa fa-plus"></i> 新增 </a>
+                <a href="{:url('User/change_status', ['method' => 'resume'])}" class="btn btn-info btn-sm ajax-post" target-form="ids" ><i class="fa fa-check-circle-o"></i> 启用 </a>
+                <a href="{:url('User/change_status', ['method' => 'forbid'])}" class="btn btn-primary btn-sm ajax-post" target-form="ids" ><i class="fa fa-ban"></i> 禁用 </a>
+                <a href="{:url('User/change_status', ['method' => 'delete'])}" class="btn btn-danger btn-sm ajax-post confirm" target-form="ids" ><i class="fa fa-trash"></i> 删除 </a>
+
+                <div class="box-tools">
+                    <form action="{:url('User/index')}" method="post">
+                        <div class="input-group input-group-sm" style="width: 200px;">
+                            <input type="text" name="keywords" class="form-control pull-right" id="keywords" placeholder="请输入ID或用户名或手机号" value="{$keywords}">
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-default"><i class="fa fa-search"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="box-body table-responsive">
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th>
+                            <label class='icheck_check-all'>
+                                <input type="checkbox" class="minimal check-all">
+                            </label>
+                        </th>
+                        <th>ID</th>
+                        <th>用户名</th>
+                        <th>用户组</th>
+                        <th>昵称</th>
+                        <th>电话</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                    {volist name="user_list" id="vo" empty="$empty"}
+                    <tr>
+                        <td>
+                            <label>
+                                <input type="checkbox" class="minimal ids" name="id[]" value="{$vo.id}" {if $vo['id'] == $Think.config.config.user_administrator || $vo['id'] == UID}disabled{/if}>
+                            </label>
+                        </td>
+                        <td>{$vo.id}</td>
+                        <td>{$vo.username}</td>
+                        <td>{if $vo['id'] == $Think.config.config.user_administrator}系统管理员{else /}{$vo.id|group_id}{/if}</td>  
+                        <td>{$vo.nickname}</td>
+                        <td>{$vo.mobile}</td>
+                        <td>{$vo.status|int_to_string}</td>
+                        <td>
+                            <div class="btn-group">
+                                {if $vo['id'] == $Think.config.config.user_administrator && $vo['id'] == UID}
+                                <a href="{:url('User/edit_user', ['id' => $vo['id']])}" class="btn btn-warning btn-xs"><i class="fa fa-edit"></i> 编辑 </a>
+                                {elseif ($vo['id'] !== $Think.config.config.user_administrator && $vo['id'] == UID) || ($vo['id'] !== $Think.config.config.user_administrator && $vo['id'] !== UID) /}
+                                <a href="{:url('User/edit_user', ['id' => $vo['id']])}" class="btn btn-warning btn-xs"><i class="fa fa-edit"></i> 编辑 </a>
+                                {if $vo['id'] !== UID && $vo['status'] == 1}
+                                <a href="{:url('User/change_status', ['method' => 'forbid', 'id' => $vo['id']])}" class="btn btn-primary btn-xs ajax-get"><i class="fa fa-ban"></i> 禁用 </a>
+                                {elseif $vo['id'] !== UID && $vo['status'] == 0 /}
+                                <a href="{:url('User/change_status', ['method' => 'resume', 'id' => $vo['id']])}" class="btn btn-info btn-xs ajax-get"><i class="fa fa-check-circle-o"></i> 启用 </a>
+                                {/if}
+                                {if $vo['id'] !== UID && $vo['status'] !== -1}
+                                <a href="{:url('User/change_status', ['method' => 'delete', 'id' => $vo['id']])}" class="btn btn-danger btn-xs confirm ajax-get"><i class="fa fa-trash"></i> 删除 </a>
+                                {/if}
+                                {else /}
+                                {if $vo['id'] == $Think.config.config.user_administrator}系统管理员{else /}{$vo.id|group_id}{/if}不可操作
+                                {/if}
+                            </div>
+                        </td>
+                    </tr>
+                    {/volist}
+                </table>
+                {$page|raw}
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<!-- 选择框控件 -->
+{js href="__STATICS__/iCheck/icheck.min.js" /}
+<script type="text/javascript">
+    $(function () {
+        //复选框
+        $('input[type="checkbox"].minimal').iCheck({
+            checkboxClass: 'icheckbox_minimal-blue',
+        });
+    });
+</script>
+{/block}

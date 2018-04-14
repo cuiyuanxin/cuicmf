@@ -1,0 +1,67 @@
+{extend name="public/base" /}
+{block name="style"}
+
+{/block}
+{block name="main_body"}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">{$meta_title}</h3>
+            </div>
+            <form action="{:url('System/write_configuration')}" method="post" class="cui_from_write">
+                {present name="id"}<input type="hidden" name="id" value="{$config.id}" />{/present}
+                <div class="box-body">
+                    <div class="form-group">
+                        <label>配置标识名称 （用于config函数调用，只能使用英文且不能重复）</label>
+                        <input type="text" name="name" class="form-control" id="name" placeholder="请输入配置标识名称" value="{$config.name|default=''}">
+                    </div>
+                    <div class="form-group">
+                        <label>配置标题 （用于后台显示的配置标题）</label>
+                        <input type="text" name="title" class="form-control" id="title" placeholder="请输入配置标题" value="{$config.title|default=''}">
+                    </div>
+                    <div class="form-group">
+                        <label>配置类型 （系统会根据不同类型解析配置值）</label>
+                        <select class="form-control" id="type" name="type">
+                            {volist name="Think.config.config.config_type_list" id="type"}
+                                <option value="{$key}" {if isset($config['type']) && $config['type'] == $key}selected="selected"{/if}>{$type}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>配置分组 （配置分组，不分组则不会显示在系统设置中）</label>
+                        <select class="form-control" id="group" name="group">
+                            {volist name="Think.config.config.config_group_list" id="group"}
+                                <option value="{$key}" {if isset($config['group']) && $config['group'] == $key}selected="selected"{/if}>{$group}</option>
+                            {/volist}
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>配置值 （配置取值）</label>
+                        <textarea class="form-control" name="value" rows="3" placeholder="请输入配置值">{$config.value|default=''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>配置项 （如果是枚举型,单选,多选 需要配置该项）</label>
+                        <textarea class="form-control" name="extra" rows="3" placeholder="请输入配置项">{$config.extra|default=''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>描述信息 （描述信息/备注）</label>
+                        <textarea class="form-control" name="remark" rows="3" placeholder="请输入描述信息">{$config.remark|default=''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>排序值 （用于分组显示的顺序，默认为 0）</label>
+                        <input type="text" name="sort" class="form-control" id="sort" placeholder="请输入排序值" value="{$config.sort|default='0'}">
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button type="button" class="btn btn-primary ajax-post submit" target-form="cui_from_write">提 交</button>
+                    <a href="{:url('System/configuration')}" class="btn btn-primary">返 回</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+
+{/block}
