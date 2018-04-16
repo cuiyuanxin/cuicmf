@@ -20,7 +20,8 @@ function root() {
     $root = $phpfile = '';
     $iscgi = (0 === strpos(PHP_SAPI, 'cgi') || false !== strpos(PHP_SAPI, 'fcgi')) ? 1 : 0;
     if ($iscgi) {
-        $temp = explode('.php', $_SERVER['PHP_SELF']);
+        //CGI/FASTCGI模式下
+        $temp = explode('.php', Request::root());
         $phpfile = rtrim(str_replace($_SERVER['HTTP_HOST'], '', $temp[0] . '.php'), '/');
     } else {
         $phpfile = rtrim($_SERVER['SCRIPT_NAME'], '/');
