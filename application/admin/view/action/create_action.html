@@ -1,0 +1,48 @@
+{extend name="public/base" /}
+{block name="main_body"}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">{$meta_title}</h3>
+            </div>
+            <form action="{:url('Action/write_action')}" method="post" class="cui_from_write">
+                {present name="id"}<input type="hidden" name="id" value="{$config.id}" />{/present}
+                <div class="box-body">
+                    <div class="form-group">
+                        <label>行为标识（输入行为标识 英文字母）</label>
+                        <input type="text" name="name" class="form-control" id="name" placeholder="请输入行为标识" value="{$config.name|default=''}">
+                    </div>
+                    <div class="form-group">
+                        <label>行为名称（输入行为名称）</label>
+                        <input type="text" name="title" class="form-control" id="title" placeholder="请输入行为名称" value="{$config.title|default=''}">
+                    </div>
+                    <div class="form-group">
+                        <label>行为类型（选择行为类型）</label>
+                        <select class="form-control" id="type" name="type">
+                            <option value="1" {if isset($config['type']) && $config['type'] == $key}selected="selected"{/if}>系统</option>
+                            <option value="2" {if isset($config['type']) && $config['type'] == $key}selected="selected"{/if}>用户</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>行为描述（输入行为描述）</label>
+                        <textarea class="form-control" name="remark" rows="3" placeholder="请输入行为描述">{$config.value|default=''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>行为规则（输入行为规则，不写则只记录日志）</label>
+                        <textarea class="form-control" name="rule" rows="3" placeholder="请输入行为规则">{$config.extra|default=''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>日志规则（记录日志备注时按此规则来生成，支持[变量|函数]。目前变量有：user,time,model,record,data）</label>
+                        <textarea class="form-control" name="log" rows="3" placeholder="请输入日志规则">{$config.remark|default=''}</textarea>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <button type="button" class="btn btn-primary ajax-post submit" target-form="cui_from_write">提 交</button>
+                    <a href="{:url('System/configuration')}" class="btn btn-primary">返 回</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{/block}
