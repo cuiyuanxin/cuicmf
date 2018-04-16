@@ -157,22 +157,14 @@ class System extends Admin {
     public function clear() {
         //临时文件
         $runtime = Env::get('runtime_path');
+        $path = ['cache', 'log', 'temp'];
         if (file_exists($runtime)) {
-            if (($handle = opendir($runtime)) !== false) {
-                while (false !== ($file = readdir($handle))) {
-                    if ($file != "." && $file != "..") {
-                        $flag = unlink($runtime . $file);
-                    }
-                }
-                closedir($handle);
-                $this->success('缓存清楚成功！');
+            foreach ($path as $key => $value) {
+                deldir($runtime . $value);
             }
-            if (!$flag) {
-                $this->error('缓存清除失败！');
-            }
+            $this->success('缓存清楚成功！');
         } else {
             $this->error('无法找到缓存目录！');
         }
     }
-
 }
