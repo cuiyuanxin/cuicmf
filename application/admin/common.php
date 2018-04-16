@@ -128,7 +128,7 @@ function toTree($data = null, $pid = 0, $reset = false) {
     foreach ($data as $item) {
         if ($pid == $item['pid']) {
             if (isset($node[$item['id']])) {
-                if($item['pid'] == 0){
+                if ($item['pid'] == 0) {
                     $item['class'] = $item['id'];
                 } else {
                     $item['class'] = $item['pid'];
@@ -171,4 +171,22 @@ function format_bytes($size, $delimiter = '') {
     for ($i = 0; $size >= 1024 && $i < 5; $i++)
         $size /= 1024;
     return round($size, 2) . $delimiter . $units[$i];
+}
+
+/**
+ * 清空缓存
+ * @param type $dir
+ */
+function deldir($dir) {
+    $dh = opendir($dir);
+    while ($file = readdir($dh)) {
+        if ($file != "." && $file != "..") {
+            $fullpath = $dir . "/" . $file;
+            if (!is_dir($fullpath)) {
+                unlink($fullpath);
+            } else {
+                deldir($fullpath);
+            }
+        }
+    }
 }
