@@ -440,6 +440,9 @@
 #export-form .backup:hover{
     font-size: 20px;
 }
+/* 定制化弹窗 */
+html .layui-layer-demo{background-color:#eee;}
+.layui-layer-demo .layui-layer-title{border:none; background-color:#333; color:#fff;}
 /*404字体*/
 /* latin-ext */
 @font-face {

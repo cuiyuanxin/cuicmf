@@ -79,16 +79,18 @@ class User extends Admin {
         if (empty($data['id'])) {
             $ret = $user->create($data);
             $msg = '添加';
+            $id = 0;
         } else {
             $ret = $user->update($data);
             $msg = '编辑';
+            $id = $data['id'];
         }
         if ($ret === false) {
             $this->error('管理员' . $msg . '失败！');
         } else {
             Cache::clear('menu');
-//            //记录行为
-//            action_log('update_rule_menu', 'user', UID, UID);
+            //记录行为
+            action_log('update_user', 'user', $id, UID);
             $this->success('管理员' . $msg . '成功！', url('User/index'));
         }
     }
@@ -103,13 +105,13 @@ class User extends Admin {
         }
         switch (strtolower($method)) {
             case 'forbid'://禁用
-                $this->forbid(app()->model('User'), [], $filed, url('User/index'), '管理员', 'menu');
+                $this->forbid(app()->model('User'), [], $filed, url('User/index'), '管理员', 'menu', 1, ['change_status_user', 'user']);
                 break;
             case 'resume'://启用
-                $this->resume(app()->model('User'), [], $filed, url('User/index'), '管理员', 'menu');
+                $this->resume(app()->model('User'), [], $filed, url('User/index'), '管理员', 'menu', 1, ['change_status_user', 'user']);
                 break;
             case 'delete'://删除
-                $this->delete(app()->model('User'), 0, [], url('User/index'), '管理员', 'menu');
+                $this->delete(app()->model('User'), 0, [], url('User/index'), '管理员', 'menu', 1, ['change_status_user', 'user']);
                 break;
             default:
                 $this->error($method . '参数非法');
@@ -135,8 +137,8 @@ class User extends Admin {
         if ($ret === false) {
             $this->error('密码修改失败！');
         } else {
-//            //记录行为
-//            action_log('update_rule_menu', 'user', UID, UID);
+            //记录行为
+            action_log('change_password', 'user', UID, UID);
             Session::delete('user_auth');
             Cookie::delete('user_auth');
             $this->success('密码修改成功', url('Login/login'));

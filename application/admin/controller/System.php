@@ -49,12 +49,12 @@ class System extends Admin {
                 if (strtotime($value)) {
                     $value = strtotime($value);
                 }
-                $model::where(['name' => $key])->setField('value', $value);
+                $model::where(['group' => $id, 'name' => $key])->setField('value', $value);
             }
         }
         Cache::clear('config');
         //记录行为
-        //action_log('update_config', 'user', UID, UID);
+        action_log('update_config', 'config', $id, UID);
         $this->success('保存成功！', url('System/index', ['group_id' => $id]));
     }
 
@@ -118,16 +118,18 @@ class System extends Admin {
         if (empty($data['id'])) {
             $ret = $config->create($data);
             $msg = '添加';
+            $id = 0;
         } else {
             $ret = $config->update($data);
             $msg = '编辑';
+            $id = $data['id'];
         }
         if ($ret === false) {
             $this->error('配置' . $msg . '失败！');
         } else {
             Cache::clear('config');
-//                    //记录行为
-//                    action_log('update_config', 'user', UID, UID);
+            //记录行为
+            action_log('config', 'config', $id, UID);
             $this->success('配置' . $msg . '成功！', url('System/configuration'));
         }
     }
@@ -138,13 +140,13 @@ class System extends Admin {
     public function change_status($method = null, $filed = 'status') {
         switch (strtolower($method)) {
             case 'forbid'://禁用
-                $this->forbid(app()->model('Config'), [], $filed, url('System/configuration'), '配置', 'config');
+                $this->forbid(app()->model('Config'), [], $filed, url('System/configuration'), '配置', 'config', 1, ['change_status_config', 'config']);
                 break;
             case 'resume'://启用
-                $this->resume(app()->model('Config'), [], $filed, url('System/configuration'), '配置', 'config');
+                $this->resume(app()->model('Config'), [], $filed, url('System/configuration'), '配置', 'config', 1, ['change_status_config', 'config']);
                 break;
             case 'delete'://删除
-                $this->delete(app()->model('Config'), 0, [], url('System/configuration'), '配置', 'config');
+                $this->delete(app()->model('Config'), 0, [], url('System/configuration'), '配置', 'config', 1, ['change_status_config', 'config']);
                 break;
             default:
                 $this->error($method . '参数非法');
@@ -167,4 +169,5 @@ class System extends Admin {
             $this->error('无法找到缓存目录！');
         }
     }
+
 }

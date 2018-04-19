@@ -27,7 +27,7 @@ function root() {
         $phpfile = rtrim($_SERVER['SCRIPT_NAME'], '/');
     }
     $root = rtrim(dirname($phpfile), '/');
-    return (($root == '/' || $root == '\\') ? '' : $root);
+    return (($root == '/' || $root == '\\' || $root == '.') ? '' : $root);
 }
 
 /**

@@ -168,7 +168,7 @@ class User extends Model {
                 Session::set('user_auth', $auth);
                 Cookie::set('user_auth', $auth);
                 //记录行为
-//                action_log('user_login', 'user', $admin['id'], $admin['id']);
+                action_log('user_login', 'user', $user['id'], $user['id']);
                 return ['code' => 1, 'msg' => '登录成功'];
             } else {
                 return ['code' => 0, 'msg' => '登录失败'];

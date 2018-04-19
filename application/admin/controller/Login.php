@@ -44,7 +44,7 @@ class Login extends Controller {
             } else if (isset($ret['code']) && $ret['code'] === 0) {
                 $this->error($ret['msg'], url('Login/login'));
             } else {
-                $this->error($ret['msg']);
+                $this->error($ret['msg'], '', -9);
             }
         } else {
             $this->assign('meta_title', '登录');

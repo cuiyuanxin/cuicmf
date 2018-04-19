@@ -184,6 +184,7 @@ class Auth {
         }
         $map = [
             'status' => 1,
+            'inspect' => 1,
         ];
         //读取用户组所有权限规则
         $rules = Db::name($this->_config['auth_rule'])->where($map)->whereIn('id', $ids)->field('condition, module, url')->select();

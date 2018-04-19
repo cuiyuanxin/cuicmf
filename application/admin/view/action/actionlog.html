@@ -1,0 +1,66 @@
+{extend name="public/base" /}
+{block name="main_body"}
+<div class="row">
+    <div class="col-xs-12">
+        <div class="box box-primary">
+            <div class="box-header">
+                <a href="{:url('Action/action_clear')}" class="btn btn-primary btn-sm ajax-get"><i class="fa fa-ban"></i> 清空 </a>
+            </div>
+            <div class="box-body table-responsive">
+                <table class="table table-hover table-bordered">
+                    <tr>
+                        <th>ID</th>
+                        <th>行为名称</th>
+                        <th>执行者</th>
+                        <th>请求类型</th>
+                        <th>请求地址</th>
+                        <th>执行时间</th>
+                        <th>操作</th>
+                    </tr>
+                    {volist name="_list" id="vo" empty="$empty"}
+                    <tr>
+                        <td>{$vo.id}</td>
+                        <td>{$vo.title}</td>
+                        <td>{$vo.username}</td>
+                        <td>{$vo.method}</td>
+                        <td>{$vo.url}</td>
+                        <td>{$vo.create_time|date="Y-m-d H:i:s"}</td>
+                        <td>
+                            <div class="btn-group">
+                                <a href="{:url('Action/action_details', ['id' => $vo['id']])}" class="btn btn-success btn-xs action_details"><i class="fa fa-search-plus"></i> 详情 </a>
+                                <a href="{:url('Action/actionlog_del', ['id' => $vo['id']])}" class="btn btn-danger btn-xs confirm ajax-get"><i class="fa fa-trash"></i> 删除 </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {/volist}
+                </table>
+                {$page|raw}
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript">
+    $(function () {
+        $('.action_details').on('click', function(){
+            var $url = $(this).attr('href');
+            $.get($url, function(result){
+                if(result.code == 0){
+                    layer.msg(result.msg, {icon: 5});
+                } else {
+                    layer.open({
+                        type: 1,
+                        skin: 'layui-layer-demo', //样式类名
+                        closeBtn: 0, //不显示关闭按钮
+                        anim: 2,
+                        shadeClose: true, //开启遮罩关闭
+                        content: '<div style="padding:20px;">' + result.data + '</div>'
+                    });
+                }
+            });
+            return false;
+        });
+    });
+</script>
+{/block}

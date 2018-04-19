@@ -237,11 +237,13 @@
                 $(function(){
                     setInterval(function() {
                         loginLosetime()
-                    }, 3600 * 60 * 30);
+                        console.log('setInterval');
+                    }, 60000 * 30);
                 });
                 // 登录超时检测
                 function loginLosetime(){
                     $.get("{:url('Login/timeout')}", function(res){
+                        console.log(res);
                         if(res.code == 0){
                             window.location.href = res.url;
                         }

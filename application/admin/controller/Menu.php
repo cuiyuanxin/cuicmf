@@ -90,16 +90,18 @@ class Menu extends Admin {
         if (empty($data['id'])) {
             $ret = Db::name('auth_rule')->insert($data);
             $msg = '添加';
+            $id = 0;
         } else {
             $ret = Db::name('auth_rule')->update($data);
             $msg = '编辑';
+            $id = $data['id'];
         }
         if ($ret === false) {
             $this->error('菜单' . $msg . '失败！');
         } else {
             Cache::clear('menu');
-//            //记录行为
-//            action_log('update_rule_menu', 'user', UID, UID);
+            //记录行为
+            action_log('update_rule_menu', 'auth_rule', $id, UID);
             $this->success('菜单' . $msg . '成功！', url('Menu/index'));
         }
     }
@@ -124,34 +126,34 @@ class Menu extends Admin {
     public function change_status($method = null, $filed = 'status') {
         switch (strtolower($method)) {
             case 'forbid'://禁用
-                $this->forbid(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu');
+                $this->forbid(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu', 1, ['change_status_rule_menu', 'auth_rule']);
                 break;
             case 'resume'://启用
-                $this->resume(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu');
+                $this->resume(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu', 1, ['change_status_rule_menu', 'auth_rule']);
                 break;
             case 'delete'://删除
-                $this->delete(Db::name('auth_rule'), 0, [], url('Menu/index'), '菜单', 'menu');
+                $this->delete(Db::name('auth_rule'), 0, [], url('Menu/index'), '菜单', 'menu', 1, ['change_status_rule_menu', 'auth_rule']);
                 break;
             case 'hide'://隐藏
-                $this->forbid(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu');
+                $this->forbid(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu', 1, ['change_status_rule_menu', 'auth_rule']);
                 break;
             case 'show'://显示
-                $this->resume(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu');
+                $this->resume(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu', 1, ['change_status_rule_menu', 'auth_rule']);
                 break;
             case 'unchecked'://不检查
-                $this->forbid(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu');
+                $this->forbid(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu', 1, ['change_status_rule_menu', 'auth_rule']);
                 break;
             case 'checked'://检查
-                $this->resume(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu');
+                $this->resume(Db::name('auth_rule'), [], $filed, url('Menu/index'), '菜单', 'menu', 1, ['change_status_rule_menu', 'auth_rule']);
                 break;
             default:
                 $this->error($method . '参数非法');
         }
     }
-    
+
     //格式化下拉列表
     private function menu2select($sid = '') {
-        $menu_select = Db::name('auth_rule')->order('sort')->column('id, pid as parent_id, title as name','id');
+        $menu_select = Db::name('auth_rule')->order('sort')->column('id, pid as parent_id, title as name', 'id');
         $tree = new Tree($menu_select);
         $html = $tree->get_tree(0, "<option value=\$id \$selected>\$spacer\$name</option>", $sid);
         return $html;
@@ -240,9 +242,9 @@ class Menu extends Admin {
             return $menu;
         }
     }
-    
+
     //Icons
-    public function icons(){
+    public function icons() {
         $json = json_decode(file_get_contents(Env::get('root_path') . 'public/data/Icons/Icons.json'), true);
         $this->assign('icon', $json);
         $this->assign('meta_title', 'Icons');

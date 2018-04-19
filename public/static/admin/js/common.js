@@ -85,9 +85,13 @@ $(function () {
                         } else {
                             layer.alert(data.msg, {icon: 5}, function (index) {
                                 layer.close(index);
-                                if (data.data == -10) {
+                                if (data.data == -10 || data.data == -9) {
                                     $('#verify_img').click();
-                                    $('#verify').val('').focus();
+                                    if (data.data == -10) {
+                                        $('#verify').val('').focus();
+                                    } else {
+                                        $('#verify').val('');
+                                    }
                                 }
                                 $(that).removeClass('disabled').prop('disabled', false);
                             });
@@ -211,7 +215,7 @@ $(function () {
     });
     /* 数据库备份、优化、修复*/
     /*清空缓存*/
-    $('.clear').on('click', function(){
+    $('.clear').on('click', function () {
         var $url = $(this).attr('href');
         $.get($url, function (data) {
             if (data.code == 1) {

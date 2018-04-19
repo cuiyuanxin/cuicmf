@@ -1,7 +1,7 @@
 <?php
 
 // +----------------------------------------------------------------------
-// | CuiCMF
+// | CuiCMF Admin共用方法
 // +----------------------------------------------------------------------
 // | Copyright (c) 2014-2018 All rights reserved.
 // +----------------------------------------------------------------------
@@ -76,7 +76,7 @@ class Admin extends Controller {
      * @return int -1表示不需要检测 0表示无后台菜单 其他表示当前url对应id
      */
     final protected function get_url_id($url = '', $status = 0) {
-        $url = $url ? : $this->request->controller() . '/' . $this->request->action();
+        $url = $url ?: $this->request->controller() . '/' . $this->request->action();
 //        $route = Request::route();
 //        $query = preg_replace('/^.+\?/U', '', $value['url']);
 //        if ($query !== $url) {
@@ -101,7 +101,7 @@ class Admin extends Controller {
         if ($status)
             $where['status'] = $status;
         $menu_id = Db::name('auth_rule')->where($where)->order('level desc, sort')->value('id'); //4级或3级(如果4级,status是0,不显示)
-        $menu_id = $menu_id ? : 0;
+        $menu_id = $menu_id ?: 0;
         return $menu_id;
     }
 
@@ -111,7 +111,7 @@ class Admin extends Controller {
      * @return array
      */
     final protected function get_admin_parents($id = 0) {
-        $id = $id ? : $this->get_url_id('', 1);
+        $id = $id ?: $this->get_url_id('', 1);
         if (empty($id))
             return [];
         $lists = Db::name('auth_rule')->order('level desc, sort')->column('pid', 'id');
@@ -136,6 +136,10 @@ class Admin extends Controller {
     final protected function accessControl() {
         $allow = Config::get('config.allow_visit'); //不受限控制器方法
         $deny = Config::get('config.deny_visit'); //仅超级管理员可访问的控制器方法
+        $inspect = Db::name('auth_rule')->where(['status' => 1, 'inspect' => 0])->value('url');
+        if ($inspect) {
+            $allow = array_merge($allow, $inspect);
+        }
         $check = strtolower($this->request->controller() . '/' . $this->request->action());
         //当前请求的QUERY_STRING参数
         $query = $this->request->query();
@@ -199,8 +203,8 @@ class Admin extends Controller {
      * @param type $url 跳转地址
      * @param type $msg 提示语
      * @param type $cache 缓存
-     * @param type $type 
-     * @param type $action 行为
+     * @param type $type 1:清空缓存 0:删除缓存
+     * @param type $action 行为 ['行为标识', 'db']
      */
     protected function forbid($model = '', $data = [], $filed = 'status', $url = '', $msg = '', $cache = false, $type = 1, $action = false) {
         $id = array_unique($this->request->param('id/a', ''));
@@ -225,7 +229,7 @@ class Admin extends Controller {
             }
             if ($action) {
                 //记录行为
-//                action_log($action, 'user', UID, UID);
+                action_log($action[0], $action[1], $id, UID);
             }
             $this->success($msg . '状态禁用成功！', $url);
         }
@@ -239,8 +243,8 @@ class Admin extends Controller {
      * @param type $url 跳转地址
      * @param type $msg 提示语
      * @param type $cache 缓存
-     * @param type $type 
-     * @param type $action 行为
+     * @param type $type 1:清空缓存 0:删除缓存
+     * @param type $action 行为 ['行为标识', 'db']
      */
     protected function resume($model = '', $data = [], $filed = 'status', $url = '', $msg = '', $cache = false, $type = 1, $action = false) {
         $id = array_unique($this->request->param('id/a', ''));
@@ -265,7 +269,7 @@ class Admin extends Controller {
             }
             if ($action) {
                 //记录行为
-//                action_log($action, 'user', UID, UID);
+                action_log($action[0], $action[1], $id, UID);
             }
             $this->success($msg . '状态启用成功！', $url);
         }
@@ -279,8 +283,8 @@ class Admin extends Controller {
      * @param type $url 跳转地址
      * @param type $msg 提示语
      * @param type $cache 缓存
-     * @param type $type 
-     * @param type $action 行为
+     * @param type $type 1:清空缓存 0:删除缓存
+     * @param type $action 行为 ['行为标识', 'db']
      */
     protected function delete($model = '', $soft = 0, $data = [], $url = '', $msg = '', $cache = false, $type = 1, $action = false) {
         $all = $this->request->param('all', '');
@@ -324,7 +328,7 @@ class Admin extends Controller {
             }
             if ($action) {
                 //记录行为
-//                action_log($action, 'user', UID, UID);
+                action_log($action[0], $action[1], $id, UID);
             }
             $this->success($msg . '删除成功！', $url);
         }
