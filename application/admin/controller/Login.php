@@ -12,12 +12,12 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
 use think\facade\Session;
 use think\facade\Cookie;
 use think\facade\Config;
+use app\common\controller\Common;
 
-class Login extends Controller {
+class Login extends Common {
 
     /**
      * 后台登录

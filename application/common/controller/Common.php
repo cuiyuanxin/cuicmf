@@ -1,7 +1,7 @@
 <?php
 
 // +----------------------------------------------------------------------
-// | CuiCMF
+// | CuiCMF Admin共用方法
 // +----------------------------------------------------------------------
 // | Copyright (c) 2014-2018 All rights reserved.
 // +----------------------------------------------------------------------
@@ -9,17 +9,20 @@
 // +----------------------------------------------------------------------
 // | Author: cuiyuanxin <15811506097@163.com>
 // +----------------------------------------------------------------------
-// [ 应用入口文件 ]
 
-namespace think;
+namespace app\common\controller;
 
+use think\Controller;
 use think\facade\Env;
 
-if (version_compare(PHP_VERSION, '5.6.27', '<'))
-    die('require PHP >5.6.27 !');
-// 加载基础文件
-require __DIR__ . '/../thinkphp/base.php';
+class Common extends Controller {
 
-// 支持事先使用静态方法设置Request对象和Config对象
-// 执行应用并响应
-Container::get('app')->run()->send();
+    public function initialize() {
+        //检查是否安装了
+        if (!is_file(Env::get('root_path') . 'public/data/install.lock')) {
+            $this->redirect('Install/Login/login');
+            exit;
+        }
+    }
+
+}

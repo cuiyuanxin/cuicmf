@@ -12,18 +12,19 @@
 
 namespace app\admin\controller;
 
-use think\Controller;
 use think\Db;
 use auth\Auth;
 use think\facade\Session;
 use think\facade\Cookie;
 use think\facade\Config;
 use think\facade\Cache;
+use app\common\controller\Common;
 
-class Admin extends Controller {
+class Admin extends Common {
 
     //后台构造方法
     public function initialize() {
+        parent::initialize();
         $auth = new Auth();
         //未登陆，不允许直接访问
         if (!is_login()) {
