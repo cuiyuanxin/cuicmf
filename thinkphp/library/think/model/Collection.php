@@ -24,8 +24,10 @@ class Collection extends BaseCollection
      */
     public function load($relation)
     {
-        $item = current($this->items);
-        $item->eagerlyResultSet($this->items, $relation);
+        if (!$this->isEmpty()) {
+            $item = current($this->items);
+            $item->eagerlyResultSet($this->items, $relation);
+        }
 
         return $this;
     }
@@ -81,4 +83,20 @@ class Collection extends BaseCollection
         return $this;
     }
 
+    /**
+     * 设置数据字段获取器
+     * @access public
+     * @param  string|array $name       字段名
+     * @param  callable     $callback   闭包获取器
+     * @return $this
+     */
+    public function withAttr($name, $callback = null)
+    {
+        $this->each(function ($model) use ($name, $callback) {
+            /** @var Model $model */
+            $model && $model->withAttribute($name, $callback);
+        });
+
+        return $this;
+    }
 }

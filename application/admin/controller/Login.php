@@ -1,9 +1,9 @@
 <?php
 
 // +----------------------------------------------------------------------
-// | CuiCMF 登录模块(不受权限约束)
+// | cuicmf 后台Login模块
 // +----------------------------------------------------------------------
-// | Copyright (c) 2014-2018 All rights reserved.
+// | Copyright (c) 2018-2019 All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -12,12 +12,12 @@
 
 namespace app\admin\controller;
 
-use think\facade\Session;
-use think\facade\Cookie;
-use think\facade\Config;
-use app\common\controller\Common;
+// use app\admin\validate\User as UserValidate;
 
-class Login extends Common {
+class Login extends Base {
+
+    // 是否批量验证
+    protected $batchValidate = true;
 
     /**
      * 后台登录
@@ -26,41 +26,57 @@ class Login extends Common {
      */
     public function login() {
         //已登录
-        if (is_login()) {
-            $this->redirect('Index/index');
-        }
-        if ($this->request->isAjax()) {
+        // if (is_login()) {
+        //     $this->redirect('Index/index');
+        // }
+        // if ($this->request->isAjax()) {
             //获取post数据
-            $data = $this->request->post();
-            // 验证数据
-            $result = $this->validate($data, 'app\admin\validate\User.login');
-            if (true !== $result) {
-                $this->error($result, '', -10);
-            }
-            $user = app()->model('User');
-            $ret = $user->login($data['username'], $data['password']);
-            if (isset($ret['code']) && $ret['code'] === 1) {
-                $this->success($ret['msg'], url('Index/index'));
-            } else if (isset($ret['code']) && $ret['code'] === 0) {
-                $this->error($ret['msg'], url('Login/login'));
-            } else {
-                $this->error($ret['msg'], '', -9);
-            }
-        } else {
-            $this->assign('meta_title', '登录');
-            return $this->fetch();
+        $data = $this->request->post('', [], 'trim');
+        // 验证数据
+        $result = $this->validate($data, 'app\admin\validate\User.login');
+        if (true !== $result) {
+            $this->result($result, 10, '', 'json');
         }
+//         $model = app()->model('User');
+//         $user = $model::where(['username' => $data['username']])->field('id, username, nickname, realname, password, status')->find();
+//         $password = cui_ucenter_md5($data['password'], Config::get('cui_config.uc_auth_key'));
+//         if (empty($user)) {
+//             $this->error('username:用户名不存在！');
+//         } elseif ($user['password'] != $password) {
+//             $this->error('password:密码错误！');
+//         } elseif (0 == $user['status']) {
+//             $this->error('username:帐号被禁用！');
+//         } elseif (2 == $user['status']) {
+//             $this->error('username:帐号锁定中！');
+//         } elseif (3 == $user['status']) {
+//             $this->error('username:帐号审核中！');
+//         } else {
+//             $data = [
+//                 'last_login_time' => time(),
+//                 'last_login_ip' => ipToint($this->request->ip())
+//             ];
+//             $auth = array(
+//                 'uid' => think_encrypt($user['id'], Config::get('cui_config.uc_auth_key')),
+//                 'username' => think_encrypt($user['username'], Config::get('cui_config.uc_auth_key')),
+//                 'realname' => think_encrypt($user['realname'], Config::get('cui_config.uc_auth_key')),
+//                 'nickname' => think_encrypt($user['nickname'], Config::get('cui_config.uc_auth_key')),
+//                 'last_login_time' => think_encrypt($data['last_login_time'], Config::get('cui_config.uc_auth_key'))
+//             );
+//             if ($model::where(['id' => $user['id']])->update($data)) {
+//                 Session::set('user_auth', $auth);
+//                 //记录行为
+// //                action_log('user_login', 'user', $user['id'], $user['id']);
+//                 $this->success('登录成功！', url('Index/index'));
+//             } else {
+//                 $this->error('登录失败！');
+//             }
+//         }
+        // } else {
+        //     $this->assign('meta_title', '登录');
+        //     return $this->fetch();
+        // }
     }
 
-    /**
-     * 退出
-     * @author 崔元欣 <15811506097@163.com>
-     */
-    public function logout() {
-        Session::delete('user_auth');
-        Cookie::delete('user_auth');
-        $this->success('退出成功，前往登录页面', url('Login/login'));
-    }
 
     /**
      * 验证码
@@ -69,36 +85,16 @@ class Login extends Common {
      */
     public function verify() {
         ob_end_clean();
-        $verify = new \think\captcha\Captcha(
-                array(
+        $verify = new \think\captcha\Captcha([
             'fontSize' => 28,
             'imageH' => 76,
             'imageW' => 0,
             'length' => 6,
-            'useCurve' => true,
-                )
-        );
-        return $verify->entry(1);
-    }
-
-    /**
-     * 登录超时检测
-     */
-    public function timeout() {
-        //设置超时为10分
-        $nowtime = time();
-        $s_time = think_decrypt(Session::get('user_auth.logintime'), Config::get('config.uc_auth_key'));
-        if ($s_time) {
-            if (($nowtime - $s_time) > 1800) {
-                Session::delete('user_auth');
-                Cookie::delete('user_auth');
-                $this->error('登录超时！', url('Login/login'));
-            }
-        } else {
-            Session::delete('user_auth');
-            Cookie::delete('user_auth');
-            $this->error('登录超时！', url('Login/login'));
-        }
+            'useCurve' => true
+        ]);
+        $verifyCode = $verify->entry(1);
+        
+        return $verifyCode;
     }
 
 }

@@ -11,15 +11,16 @@
 
 return [
     // 生成应用公共文件
-    //'__file__' => ['common.php'],
+    '__file__' => [],
 
     // 定义demo模块的自动生成 （按照实际定义的文件名生成）
-    'install'     => [
-        '__file__'   => ['common.php'],
-        '__dir__'    => ['controller', 'view'],
-        'controller' => ['Index'],
-        //'model'      => ['User', 'UserType'],
-        'view'       => ['index/index'],
+    'admin'     => [
+        '__file__'   => [],
+        '__dir__'    => ['validate'],
+        'controller' => [],
+        'model'      => [],
+        'view'       => [],
+        'validate'   => ['User']
     ],
 
     // 其他更多的模块定义

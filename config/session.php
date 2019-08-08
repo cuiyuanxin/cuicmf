@@ -20,7 +20,13 @@ return [
     // SESSION 前缀
     'prefix'         => 'cui',
     // 驱动方式 支持redis memcache memcached
-    'type'           => '',
+    'type'           => Env::get('REDIS_TYPE', ''),
     // 是否自动开启 SESSION
     'auto_start'     => true,
+    // redis主机
+    'host'           => Env::get('REDIS_HOST', '127.0.0.1'),
+    // redis端口
+    'port'           => Env::get('REDIS_PORT', 6379),
+    // 密码
+    'password'       => Env::get('REDIS_PASSWORD', ''),
 ];
