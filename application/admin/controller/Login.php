@@ -12,12 +12,7 @@
 
 namespace app\admin\controller;
 
-// use app\admin\validate\User as UserValidate;
-
 class Login extends Base {
-
-    // 是否批量验证
-    protected $batchValidate = true;
 
     /**
      * 后台登录
@@ -25,56 +20,23 @@ class Login extends Base {
      * @author 崔元欣 <15811506097@163.com>
      */
     public function login() {
-        //已登录
-        // if (is_login()) {
-        //     $this->redirect('Index/index');
-        // }
-        // if ($this->request->isAjax()) {
-            //获取post数据
+        // 获取post数据
         $data = $this->request->post('', [], 'trim');
         // 验证数据
         $result = $this->validate($data, 'app\admin\validate\User.login');
+
         if (true !== $result) {
-            $this->result($result, 10, '', 'json');
+            $this->result('', 1, $result, 'json');
         }
-//         $model = app()->model('User');
-//         $user = $model::where(['username' => $data['username']])->field('id, username, nickname, realname, password, status')->find();
-//         $password = cui_ucenter_md5($data['password'], Config::get('cui_config.uc_auth_key'));
-//         if (empty($user)) {
-//             $this->error('username:用户名不存在！');
-//         } elseif ($user['password'] != $password) {
-//             $this->error('password:密码错误！');
-//         } elseif (0 == $user['status']) {
-//             $this->error('username:帐号被禁用！');
-//         } elseif (2 == $user['status']) {
-//             $this->error('username:帐号锁定中！');
-//         } elseif (3 == $user['status']) {
-//             $this->error('username:帐号审核中！');
-//         } else {
-//             $data = [
-//                 'last_login_time' => time(),
-//                 'last_login_ip' => ipToint($this->request->ip())
-//             ];
-//             $auth = array(
-//                 'uid' => think_encrypt($user['id'], Config::get('cui_config.uc_auth_key')),
-//                 'username' => think_encrypt($user['username'], Config::get('cui_config.uc_auth_key')),
-//                 'realname' => think_encrypt($user['realname'], Config::get('cui_config.uc_auth_key')),
-//                 'nickname' => think_encrypt($user['nickname'], Config::get('cui_config.uc_auth_key')),
-//                 'last_login_time' => think_encrypt($data['last_login_time'], Config::get('cui_config.uc_auth_key'))
-//             );
-//             if ($model::where(['id' => $user['id']])->update($data)) {
-//                 Session::set('user_auth', $auth);
-//                 //记录行为
-// //                action_log('user_login', 'user', $user['id'], $user['id']);
-//                 $this->success('登录成功！', url('Index/index'));
-//             } else {
-//                 $this->error('登录失败！');
-//             }
-//         }
-        // } else {
-        //     $this->assign('meta_title', '登录');
-        //     return $this->fetch();
-        // }
+        $userModel = app()->model('User');
+
+        $user = $userModel->login($data);
+        if(isset($user) && $user) {
+            $resultData = isset($user['data']) ? $user['data'] : '';
+            $this->result($resultData, $user['code'], $user['msg'], 'json');
+        } else {
+            $this->result('', -1, '接口请求出错，请联系管理员！', 'json');
+        }
     }
 
 

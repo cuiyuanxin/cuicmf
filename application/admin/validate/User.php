@@ -79,7 +79,7 @@ class User extends Validate {
      * @return type
      */
     public function sceneLogin() {
-        return $this->only(['username', 'password', 'verify'])->remove('username', 'unique')->append('username', 'checkOnlyLogin');
+        return $this->only(['username', 'password'])->remove('username', 'unique')->append('username', 'checkOnlyLogin');
     } 
     
     /**
@@ -126,4 +126,5 @@ class User extends Validate {
         }
         return '用户名不存在，请联系管理员！';
     }
+
 }
