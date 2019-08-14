@@ -18,6 +18,9 @@ Route::group('admin', function () {
     // 表单验证
     Route::post('login/validation', 'admin/login/validation')->ext('');
 
+    // 获取用户信息
+    Route::get('user/getUserInfo', 'admin/user/get_user_info')->ext('');
+
 })->header('Access-Control-Allow-Headers', 'Authorization, Content-Type, If-Match, If-Modified-Since, If-None-Match, If-Unmodified-Since, X-Requested-With, X-URL-PATH, X-Token')->allowCrossDomain();
 
 //->pattern([])

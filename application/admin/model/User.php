@@ -15,6 +15,7 @@ namespace app\admin\model;
 use think\Model;
 use think\facade\Request;
 use think\facade\Config;
+use Firebase\JWT\JWT;
 
 class User extends Model {
 
@@ -40,8 +41,10 @@ class User extends Model {
      * @author 崔元欣 <15811506097@163.com>
      */
     public function login($data) {
-        $user = self::where(['username' => $data['username']])->field('id, username, nickname, realname, password, status')->find();
-        $password = cui_ucenter_md5($data['password'], Config::get('cuicmf.uc_auth_key'));
+        $key = Config::get('cuicmf.uc_auth_key');
+
+        $user = self::where(['username' => $data['username']])->field('id, password, status')->find();
+        $password = cui_ucenter_md5($data['password'], $key);
         if (empty($user)) {
             return ['code' => 1, 'msg' => '用户名不存在！'];
         } elseif ($user['password'] != $password) {
@@ -57,26 +60,47 @@ class User extends Model {
                 'last_login_time' => time(),
                 'last_login_ip' => ipToint(Request::ip())
             ];
-            if (self::where(['id' => $user['id']])->update($data)) {
-                if(isset($user['realname']) && $user['realname']) {
-                    $nickname =  $user['realname'];
-                } elseif(isset($user['nickname']) && $user['nickname']) {
-                    $nickname =  $user['nickname'];
-                } else {
-                    $nickname =  $user['username'];
-                }
-                $auth = array(
-                    'uid' => $user['id'],
-                    'nickname' => $nickname,
-                    'last_login_time' => $data['last_login_time']
-                );
-                //记录行为
-//                action_log('user_login', 'user', $user['id'], $user['id']);
 
-                return ['data' => $auth, 'code' => 0, 'msg' => '登录成功！'];
+            if (self::where(['id' => $user['id']])->update($data)) {
+
+                $nowtime = time();
+
+				$token = [
+                    'iss' => 'http://www.cuicmf.com', //签发者
+                    'sub' => think_encrypt($user['id'], Config::get('cuicmf.uc_auth_key')),
+                    'aud' => 'http://www.cuicmf.com', //jwt所面向的用户
+                    'iat' => $nowtime, //签发时间
+                    'nbf' => $nowtime + Config::get('cuicmf.jwt_nbf'), //在什么时间之后该jwt才可用
+                    'exp' => $nowtime + Config::get('cuicmf.jwt_exp'), //过期时间-10min
+                    'jti' => think_encrypt($user['id'], Config::get('cuicmf.uc_auth_key'))
+                ];
+				// 生成token
+				$jwt = JWT::encode($token, $key);
+
+                return ['data' => $jwt, 'code' => 0, 'msg' => '登录成功！'];
             } else {
                 return ['code' => 1, 'msg' => '登录失败！'];
             }
         }
+    }
+
+    /**
+     * 获取用户数据
+     * @param  integer $userId 用户id
+     * @param  string  $field  查询字段
+     * @return [type]          [description]
+     */
+    public function get_user_info($userId = 0, $field = '*') {
+        if($userId) {
+            $result = self::where(['id' => $userId])->field($field)->find();
+
+            if($result) {
+                return ['data' => $result, 'code' => 0, 'msg' => '用户数据获取成功！'];
+            }
+
+            return ['code' => 1, 'msg' => '用户数据获取失败！'];
+        }
+
+        return ['code' => 1, 'msg' => '用户数据获取失败！'];
     }
 }
